@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar System</title>
+</head>
+<body style="margin: 0; overflow: hidden;">
+
+<script type ="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.124/build/three.module.js';
+  import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.124/examples/jsm/loaders/GLTFLoader.js';
+  import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+
+  const scene = new THREE.Scene(); 
+  const backGround = new THREE.TextureLoader().load('starmap_16k.jpg');
+  scene.background = backGround;
+
+  //Main Camera
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(10,5,10);
+
+  //Cameras
+  const sunCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const earthCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const jupyterCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const saturnCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const ovniCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const cometCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const moonCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const mercuryCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const venusCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const marsCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const uraneCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const neptuneCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  //Renderer
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  //Controls Orbit
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.enableZoom = true;
+  controls.enablePan = true;
+  controls.enableKeys = true;
+  controls.keyPanSpeed = 50.0;
+
+  //controls orbit outras camaras
+  const sunControls = new OrbitControls(sunCamera, renderer.domElement);
+  const earthControls = new OrbitControls(earthCamera, renderer.domElement);
+  const jupyterControls = new OrbitControls(jupyterCamera, renderer.domElement);
+  const saturnControls = new OrbitControls(saturnCamera, renderer.domElement);
+  const ovniControls = new OrbitControls(ovniCamera, renderer.domElement);
+  const cometControls = new OrbitControls(cometCamera, renderer.domElement);
+  const moonControls = new OrbitControls(moonCamera, renderer.domElement);
+  const mercuryControls = new OrbitControls(mercuryCamera, renderer.domElement);
+  const venusControls = new OrbitControls(venusCamera, renderer.domElement);
+  const marsControls = new OrbitControls(marsCamera, renderer.domElement);
+  const uraneControls = new OrbitControls(uraneCamera, renderer.domElement);
+  const neptuneControls = new OrbitControls(neptuneCamera, renderer.domElement);
+
+
+
+  //Stars Particles
+  const stars = new THREE.BufferGeometry();
+  const numCount = 5000;
+
+  const v = new Float32Array(numCount * 3);
+
+  //Expandir a profundidade das estrelas
+  for (let i = 0; i < numCount; i++) {
+  const r = Math.random() * 200 + 50; 
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos((Math.random() * 2) - 1);
+
+  const x = r * Math.sin(phi) * Math.cos(theta);
+  const y = r * Math.sin(phi) * Math.sin(theta);
+  const z = r * Math.cos(phi);
+
+  v[i * 3] = x;     
+  v[i * 3 + 1] = y;  
+  v[i * 3 + 2] = z;  
+}
+
+  //Expandir estrelas no meio ao pé dos planetas
+  for(let i = 0; i < numCount; i++) {
+  v[i] = (Math.random() - 0.5) * 100;
+}
+
+  stars.setAttribute ("position", new THREE.BufferAttribute(v, 3));
+
+  const starTexture = new THREE.TextureLoader().load('ronaldostar.png')
+  const starMesh = new THREE.PointsMaterial({map: starTexture, size : 0.3, sizeAttenuation: true, transparent: true})
+  const star = new THREE.Points(stars,starMesh);
+  scene.add(star);
+
+  // Sol
+  const textureSun = new THREE.TextureLoader().load('sunny.jpg');
+  const geometrySun = new THREE.SphereGeometry(2, 32, 32); 
+  const materialSun = new THREE.MeshBasicMaterial({ map: textureSun, emissive: 0xffff00 });
+  const sphereSun = new THREE.Mesh(geometrySun, materialSun);
+  scene.add(sphereSun);
+
+  // Luz Solar
+  const sunLight = new THREE.PointLight(0xffffff, 1.5, 100);
+  sunLight.position.set(0, 0, 0); 
+  scene.add(sunLight);
+
+  // Luz para componente difusa
+  //const diffuseLight = new THREE.DirectionalLight(0xffffff, 1);
+  //diffuseLight.position.set(0.1, 0, 0);
+  //scene.add(diffuseLight);
+
+  // Luz para componente especular
+  //const specularLight = new THREE.PointLight(0xffffff, 1, 50);
+  //specularLight.position.set(0.1, 0, 0);
+  //scene.add(specularLight);
+
+  // Mercurio
+  const textureMercury = new THREE.TextureLoader().load('mercurymap.jpg');
+  const geometryMercury = new THREE.SphereGeometry(0.1, 32, 32);
+  const materialMercury = new THREE.MeshPhongMaterial({ map: textureMercury });
+  const sphereMercury = new THREE.Mesh(geometryMercury, materialMercury);
+  scene.add(sphereMercury);
+
+  // Venus
+  const textureVenus = new THREE.TextureLoader().load('venusmap.jpg');
+  const geometryVenus = new THREE.SphereGeometry(0.3, 32, 32);
+  const materialVenus = new THREE.MeshPhongMaterial({ map: textureVenus });
+  const sphereVenus = new THREE.Mesh(geometryVenus, materialVenus);
+  scene.add(sphereVenus);
+
+  // Terra
+  const textureEarth = new THREE.TextureLoader().load('earthmap1k.jpg');
+  const textureEarthLights = new THREE.TextureLoader().load('earthlights1k.jpg');
+  const geometryEarth = new THREE.SphereGeometry(0.5, 32, 32);
+  const materialEarth = new THREE.MeshPhongMaterial({
+    map: textureEarth,
+    emissiveMap: textureEarthLights,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.5
+  });
+  const sphereEarth = new THREE.Mesh(geometryEarth, materialEarth);
+  scene.add(sphereEarth);
+
+  // Nuvens da Terra
+  const textureClouds = new THREE.TextureLoader().load('earthcloudmap.jpg');
+  const geometryClouds = new THREE.SphereGeometry(0.51, 32, 32); 
+  const materialClouds = new THREE.MeshStandardMaterial({
+    map: textureClouds,
+    transparent: true,  
+    opacity: 0.4        
+  });
+  const sphereClouds = new THREE.Mesh(geometryClouds, materialClouds);
+  scene.add(sphereClouds);
+
+  // Lua
+  const textureMoon = new THREE.TextureLoader().load('moonmap1k.jpg');
+  const geometryMoon = new THREE.SphereGeometry(0.08, 32, 32);
+  const materialMoon = new THREE.MeshPhongMaterial({ map: textureMoon });
+  const sphereMoon = new THREE.Mesh(geometryMoon, materialMoon);
+  scene.add(sphereMoon);
+
+  // Marte
+  const textureMars = new THREE.TextureLoader().load('mars_1k_color.jpg');
+  const geometryMars = new THREE.SphereGeometry(0.3, 32, 32);
+  const materialMars = new THREE.MeshLambertMaterial({ map: textureMars });
+  const sphereMars = new THREE.Mesh(geometryMars, materialMars);
+  scene.add(sphereMars);
+
+  //Júpiter
+  const textureJupyter = new THREE.TextureLoader().load('jupiter2_4k.jpg');
+  const geometryJupyter = new THREE.SphereGeometry(1, 32, 32);
+  const materialJupyter = new THREE.MeshLambertMaterial({ map: textureJupyter });
+  const sphereJupyter = new THREE.Mesh(geometryJupyter, materialJupyter);
+  scene.add(sphereJupyter);
+
+  //Saturno
+  const textureSaturn = new THREE.TextureLoader().load('saturnmap.jpg');
+  const geometrySaturn = new THREE.SphereGeometry(0.9, 32, 32);
+  const materialSaturn = new THREE.MeshLambertMaterial({ map: textureSaturn });
+  const sphereSaturn = new THREE.Mesh(geometrySaturn, materialSaturn);
+  scene.add(sphereSaturn);
+
+  //Anel Saturno
+  const ringGeometry = new THREE.RingGeometry(1.4, 1.1, 64);    
+  const ringColor = new THREE.TextureLoader().load('saturnringcolor.jpg')
+  const ringMaterial = new THREE.MeshBasicMaterial({ map: ringColor, side: THREE.DoubleSide });
+  const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
+  ringMesh.rotation.x = Math.PI / 2; 
+  ringMesh.rotation.y = Math.PI / 8;
+  sphereSaturn.add(ringMesh); 
+
+  //Urano
+  const textureUrano = new THREE.TextureLoader().load('uranusmap.jpg');
+  const geometryUrano = new THREE.SphereGeometry(0.6, 32, 32);
+  const materialUrano = new THREE.MeshLambertMaterial({ map: textureUrano });
+  const sphereUrano = new THREE.Mesh(geometryUrano, materialUrano);
+  scene.add(sphereUrano);
+
+  //Neptuno
+  const textureNeptuno = new THREE.TextureLoader().load('neptunemap.jpg');
+  const geometryNeptuno = new THREE.SphereGeometry(0.65,32,32);
+  const materialNeptuno = new THREE.MeshLambertMaterial({map:textureNeptuno});
+  const sphereNeptuno = new THREE.Mesh(geometryNeptuno,materialNeptuno);
+  scene.add(sphereNeptuno);
+
+  
+
+  //Aneis asteroides de radius ao sol
+  const orbitMercury = createEllipticalOrbit(5, 3, 128, 'white');
+  orbitMercury.rotation.x = Math.PI / 2;
+
+  const orbitVenus = createEllipticalOrbit(10, 8, 128, 'white');
+  orbitVenus.rotation.x = Math.PI / 2;
+
+  const orbitEarth = createEllipticalOrbit(14.2, 10.2, 128, 'white'); 
+  orbitEarth.rotation.x = Math.PI / 2;
+
+  const orbitMars = createEllipticalOrbit(22, 17, 128, 'white');
+  orbitMars.rotation.x = Math.PI / 2;
+
+  const orbitJupiter = createEllipticalOrbit(30, 24, 128, 'white');
+  orbitJupiter.rotation.x = Math.PI / 2;
+
+  const orbitSaturn = createEllipticalOrbit(50, 43, 128, 'white');
+  orbitSaturn.rotation.x = Math.PI / 2;
+
+  const orbitUranus = createEllipticalOrbit(62, 54, 128, 'white');
+  orbitUranus.rotation.x = Math.PI / 2;
+
+  const orbitNeptune = createEllipticalOrbit(80, 71, 128, 'white');
+  orbitNeptune.rotation.x = Math.PI / 2;
+
+  //Cinturão de asteroides
+  const numberOfAsteroids = 2000;
+  const asteroidTexture = new THREE.TextureLoader().load('asteroidTexture.jpg');
+  const beltOfAsteroids = new THREE.Group();
+
+  for(let i = 0; i < numberOfAsteroids; i++) {
+    const asteroidSize = Math.random() * 0.1 + 0.05;
+
+    const angle = Math.random() * 2 * Math.PI;
+    const radiusAsteroidsMaior = 38 + Math.random() * 10;
+    const radiusAsteroidsMenor = 30 + Math.random() * 10;
+    const altura = (Math.random() - 0.5) *2;
+
+    const x = radiusAsteroidsMaior * Math.cos(angle);
+    const z = radiusAsteroidsMenor * Math.sin(angle);
+    const y = altura;
+
+    const geometryAsteroid = new THREE.SphereGeometry(asteroidSize, 16, 16);
+    const materialAsteroid = new THREE.MeshStandardMaterial({ map: asteroidTexture });
+    const asteroid = new THREE.Mesh(geometryAsteroid, materialAsteroid);
+
+    
+    asteroid.position.set(x, y, z);
+
+    asteroid.rotation.x = Math.random() * Math.PI;
+    asteroid.rotation.y = Math.random() * Math.PI;
+
+    beltOfAsteroids.add(asteroid);
+
+  }
+    scene.add(beltOfAsteroids);
+
+
+  // Velocidades
+  let angleMercury = 0;
+  let angleVenus = 0;
+  let angleEarth = 0;
+  let angleMoon = 0;
+  let angleMars = 0;
+  let angleJupyter = 0;
+  let angleSaturn = 0;
+  let angleUrano = 0;
+  let angleNeptuno = 0;
+  let angleComet = 0;
+  let rotationAngle = 0;
+
+  //Cameras
+  let useSunCamera = false; 
+  let useEarthCamera = false;
+  let useJupyterCamera = false;
+  let useSaturnCamera = false;
+  let orbitWatch = false;
+  let useOvniCamera = false;
+  let useCometCamera = false;
+  let xrayMode = false;
+  let useMoonCamera = false;
+  let useMercuryCamera = false;
+  let useVenusCamera = false;
+  let useMarsCamera = false;
+  let useUraneCamera = false;
+  let useNeptuneCamera = false;
+
+
+  //Parte do Xray
+  const xrayMaterial = new THREE.MeshBasicMaterial({
+      color: 0x00bfff, 
+      transparent: true, 
+      opacity: 0.3,    
+      side: THREE.DoubleSide 
+    });
+
+  function toggleXrayMode() {
+    xrayMode = !xrayMode;
+    scene.traverse((object) => {
+      if (object.isMesh) {
+        if(xrayMode){
+          object.userData.originalMaterial = object.material; // Guarda o material original
+          object.material = xrayMaterial;
+        }else {
+        object.material = object.userData.originalMaterial; // Restaura o material original
+        }
+      }
+    });
+  }
+
+  const loader = new GLTFLoader();
+  let cometModel = null;
+
+  const textureLoader = new THREE.TextureLoader();
+  const cometTexture = textureLoader.load('./Asteroid_2b.png');
+
+  loader.load(
+  './Asteroid_2b.glb', 
+  (gltf) => {
+    cometModel = gltf.scene; 
+    scene.add(cometModel); 
+
+    
+    cometModel.position.set(5, 0,0 );
+    cometModel.scale.set(0.3, 0.3, 0.3);
+
+    cometModel.traverse((node) => {
+      if (node.isMesh) {
+        node.material = new THREE.MeshStandardMaterial({
+          map: cometTexture,
+          emissive: 0x555555,
+          emissiveIntensity: 0.15,
+          metalness: 0.7,
+          roughness: 0.25,
+        });
+      }
+    });
+  },
+  (xhr) => {
+    console.log((xhr.loaded / xhr.total) * 100 + '% loaded'); 
+  },
+  (error) => {
+    console.error('An error occurred:', error); 
+  }
+);
+
+const points = [
+    new THREE.Vector3(20, 10, 10),
+    new THREE.Vector3(1, 1, 1),
+  ];
+
+  const path = new THREE.CatmullRomCurve3(points);
+
+  const pathGeometry = new THREE.BufferGeometry().setFromPoints(
+    path.getPoints(50)
+  );
+  const pathMaterialComet = new THREE.MeshBasicMaterial({transparent: true});
+  const pathObject = new THREE.Line(pathGeometry);
+
+
+
+
+  window.addEventListener('keydown', (event) => {
+    if(event.code === 'Digit1') {
+      useEarthCamera = !useEarthCamera;
+    }
+    if (event.code === 'Digit2') {
+      useSunCamera = !useSunCamera;
+    }
+    if (event.code === 'Digit3') {
+      useJupyterCamera = !useJupyterCamera;
+    }
+    if (event.code === 'Digit4') {
+      useSaturnCamera = !useSaturnCamera;
+    }
+    if(event.code === 'KeyO') {
+        orbitWatch = !orbitWatch;
+    }
+    if(event.code === 'KeyX') {
+      toggleXrayMode()
+    }
+    if(event.code === 'Digit7') {
+      useCometCamera = !useCometCamera;
+    }
+    if(event.code === 'Digit9') {
+      useOvniCamera = !useOvniCamera;
+    }
+    if (event.code === 'Digit0') {
+      useMoonCamera = !useMoonCamera;
+    }
+    if (event.code === 'KeyM') {
+      useMercuryCamera = !useMercuryCamera;
+    }
+    if (event.code === 'KeyV') {
+      useVenusCamera = !useVenusCamera;
+    }
+    if (event.code === 'Digit5') {
+      useMarsCamera = !useMarsCamera;
+    }
+    if (event.code === 'KeyU') {
+      useUraneCamera = !useUraneCamera;
+    }
+    if (event.code === 'KeyN') {
+      useNeptuneCamera = !useNeptuneCamera;
+    }
+
+    if(orbitWatch) {
+      scene.add(orbitMercury);
+      scene.add(orbitVenus);
+      scene.add(orbitEarth);
+      scene.add(orbitMars);
+      scene.add(orbitJupiter);
+      scene.add(orbitSaturn);
+      scene.add(orbitUranus);
+      scene.add(orbitNeptune);
+      scene.add(pathObject);
+    } else {
+      scene.remove(orbitMercury);
+      scene.remove(orbitVenus);
+      scene.remove(orbitEarth);
+      scene.remove(orbitMars);
+      scene.remove(orbitJupiter); 
+      scene.remove(orbitSaturn);
+      scene.remove(orbitUranus);
+      scene.remove(orbitNeptune);
+      scene.remove(pathObject);
+    }
+    
+  });
+
+  //Função que cria OVNI
+  function createUFO(x , y, z, scale = 0.2) {
+    const ufo = new THREE.Group();
+
+    // Corpo do OVNI
+    const bodyGeometry = new THREE.SphereGeometry(1, 32, 16);
+    const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x111111,emissive: 0x222222, emissiveIntensity:2.0});
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.scale.set(1.2 * scale, 0.3 * scale, 1.2 * scale);
+    ufo.add(body);
+
+    // Esfera
+    const domeGeometry = new THREE.SphereGeometry(0.12, 32, 16);
+    const domeMaterial = new THREE.MeshPhongMaterial({ color: 0x88ccff,emissive:0x225577, transparent: true, opacity: 0.6 });
+    const dome = new THREE.Mesh(domeGeometry, domeMaterial);
+    dome.position.set(0, scale * 0.3 , 0);
+    ufo.add(dome);
+
+    // Luzes na parte de baixo
+    const lightGeometry = new THREE.SphereGeometry(0.01, 16, 16);
+    const lightMaterial = new THREE.MeshPhongMaterial({ emissive:0xffff00,emissiveIntensity:4.0,color: 0x000000});
+
+    for (let i = 0; i < 8; i++) {
+        const light = new THREE.Mesh(lightGeometry, lightMaterial);
+        const angle = (i / 8) * Math.PI * 2;
+        light.position.set(
+            Math.cos(angle) * 1.0 * scale,
+            -0.2 * scale,
+            Math.sin(angle) * 1.0 * scale
+        );
+        ufo.add(light);
+    }
+
+    ufo.position.set(x, y, z);
+    return ufo;
+}
+
+
+const OVNI = createUFO(15, sphereSun.position.y, 0);
+scene.add(OVNI);
+
+  //Método que cira elipses para as orbitas
+  function createEllipticalOrbit(a, b, segments = 128, color = 'white') {
+  const curve = new THREE.EllipseCurve(
+    0, 0,           
+    a, b,           
+    0, 2 * Math.PI, 
+    false,          
+    0               
+  );
+
+  const points = curve.getPoints(segments); 
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+
+  const material = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 });
+
+  return new THREE.LineLoop(geometry, material);
+}
+
+
+  function animate() {
+    renderer.render(scene, camera);
+    const time = Date.now();
+    requestAnimationFrame(animate);
+
+    controls.update();
+
+    // Sol
+    sphereSun.rotation.y += 0.0005;
+
+    // Mercurio
+    angleMercury += 0.03; 
+    const orbitRadiusMercuryMaior = 5;
+    const orbitRadiusMercuryMenor = 3;
+    sphereMercury.position.x = orbitRadiusMercuryMaior * Math.cos(angleMercury);
+    sphereMercury.position.z = orbitRadiusMercuryMenor * Math.sin(angleMercury);
+    sphereMercury.rotation.y += 0.001
+
+    // Venus
+    angleVenus += 0.02;
+    const orbitRadiusVenusMaior = 10; 
+    const orbitRadiusVenusMenor = 8; 
+    sphereVenus.position.x = orbitRadiusVenusMaior * Math.cos(angleVenus);
+    sphereVenus.position.z = orbitRadiusVenusMenor * Math.sin(angleVenus);
+    sphereVenus.rotation.y += 0.00065
+
+    // Terra
+    angleEarth += 0.007;
+    const orbitRadiusEarthMaior = 14.2;
+    const orbitRadiusEarthMenor = 10.2;  
+    sphereEarth.position.x = orbitRadiusEarthMaior * Math.cos(angleEarth);
+    sphereEarth.position.z = orbitRadiusEarthMenor * Math.sin(angleEarth);
+    sphereEarth.rotation.y +=0.005
+    sphereClouds.position.x = sphereEarth.position.x;
+    sphereClouds.position.y = sphereEarth.position.y;
+    sphereClouds.position.z = sphereEarth.position.z;
+    sphereClouds.rotation.y += 0.0005; 
+
+    //Cometa
+    const t = ((time / 70000) % 6) / 6;
+    const position = path.getPointAt(t);
+    cometModel.position.copy(position);
+    const tangent = path.getTangentAt(t).normalize();
+    cometModel.lookAt(position.clone().add(tangent));
+    cometModel.rotation.y += 0.003
+
+
+    // Lua
+    const inclinationAngleMoon = Math.PI / 10; // Inclinação leve da órbita da Lua
+    const orbitRadiusMoon = 1.5;  // Raio da órbita da Lua
+    angleMoon += 0.01;            // Velocidade da órbita da Lua
+    sphereMoon.rotation.y += 0.005
+
+    // Ajuste de posição da Lua com inclinação
+    sphereMoon.position.x = sphereEarth.position.x + orbitRadiusMoon * Math.cos(angleMoon);
+    sphereMoon.position.z = sphereEarth.position.z + orbitRadiusMoon * Math.sin(angleMoon) * Math.cos(inclinationAngleMoon);
+    sphereMoon.position.y = sphereEarth.position.y + 0.2 + orbitRadiusMoon * Math.sin(angleMoon) * Math.sin(inclinationAngleMoon);
+
+
+    // Marte
+    angleMars += 0.005;
+    const orbitRadiusMarsMaior = 22;
+    const orbitRadiusMarsMenor = 17;
+    sphereMars.position.x = orbitRadiusMarsMaior * Math.cos(angleMars);
+    sphereMars.position.z = orbitRadiusMarsMenor * Math.sin(angleMars);
+    sphereMars.rotation.y += 0.008
+
+    //Jupiter
+    angleJupyter += 0.008;
+    const orbitRadiusJupyterMaior = 30;
+    const orbitRadiusJupyterMenor = 24;
+    sphereJupyter.position.x = orbitRadiusJupyterMaior * Math.cos(angleJupyter);
+    sphereJupyter.position.z = orbitRadiusJupyterMenor * Math.sin(angleJupyter);
+    sphereJupyter.rotation.y += 0.01
+
+    //Saturn
+    angleSaturn += 0.006;
+    const orbitRadiusSaturnMaior = 50;
+    const orbitRadiusSaturnMenor = 43;
+    sphereSaturn.position.x = orbitRadiusSaturnMaior * Math.cos(angleSaturn);
+    sphereSaturn.position.z = orbitRadiusSaturnMenor * Math.sin(angleSaturn);
+    sphereSaturn.rotation.y += 0.03
+
+    //Urano
+    angleUrano += 0.003;
+    const orbitRadiusUranoMaior = 62
+    const orbitRadiusUranoMenor = 54;
+    sphereUrano.position.x = orbitRadiusUranoMaior * Math.cos(angleUrano);
+    sphereUrano.position.z = orbitRadiusUranoMenor * Math.sin(angleUrano);
+    sphereUrano.rotation.y += 0.05
+
+    //Neptuno
+    angleNeptuno += 0.001;
+    const orbitRadiusNeptunoMaior = 80;
+    const orbitRadiusNeptunoMenor = 71;
+    sphereNeptuno.position.x = orbitRadiusNeptunoMaior * Math.cos(angleNeptuno);
+    sphereNeptuno.position.z = orbitRadiusNeptunoMenor * Math.sin(angleNeptuno);
+    sphereNeptuno.rotation.y += 0.04
+
+    //Camera Sol (configurações)
+    sunCamera.position.set(sphereSun.position.x + 5, sphereSun.position.y + 3, sphereSun.position.z);
+    sunCamera.lookAt(sphereSun.position);
+    
+    //Camera Terra (configurações)
+    earthCamera.position.set(sphereEarth.position.x + 1.5, sphereEarth.position.y + 0.5, sphereEarth.position.z);
+    earthCamera.lookAt(sphereEarth.position);
+
+    //Camera Jupyter (configurações)
+    jupyterCamera.position.set(sphereJupyter.position.x + 3, sphereJupyter.position.y, sphereJupyter.position.z);
+    jupyterCamera.lookAt(sphereJupyter.position);
+
+    //Camera Saturn (configurações)
+    saturnCamera.position.set(sphereSaturn.position.x + 3, sphereSaturn.position.y + 0.5, sphereSaturn.position.z);
+    saturnCamera.lookAt(sphereSaturn.position);
+
+    //Camera OVNI (configurações)
+    ovniCamera.position.set(OVNI.position.x + 1.5, OVNI.position.y + 0.3, OVNI.position.z);
+    ovniCamera.lookAt(OVNI.position);
+
+    //Camera Cometa (configurações)
+    cometCamera.position.set(cometModel.position.x + 3,cometModel.position.y + 0.5,cometModel.position.z);
+    cometCamera.lookAt(cometModel.position);
+
+    //Camera lua (configurações)
+    moonCamera.position.set(sphereMoon.position.x + 3,sphereMoon.position.y + 0.5,sphereMoon.position.z);
+    moonCamera.lookAt(sphereMoon.position);
+
+    //Camera Mercurio (configurações)
+    mercuryCamera.position.set(sphereMercury.position.x + 3,sphereMercury.position.y + 0.5,sphereMercury.position.z);
+    mercuryCamera.lookAt(sphereMercury.position);
+
+    //Camera Venus (configurações)
+    venusCamera.position.set(sphereVenus.position.x + 3,sphereVenus.position.y + 0.5,sphereVenus.position.z);
+    venusCamera.lookAt(sphereVenus.position);
+
+    //Camera Marte (configurações)
+    marsCamera.position.set(sphereMars.position.x + 3,sphereMars.position.y + 0.5,sphereMars.position.z);
+    marsCamera.lookAt(sphereMars.position);
+
+    //Camera Urano (configurações)
+    uraneCamera.position.set(sphereUrano.position.x + 3,sphereUrano.position.y + 0.5,sphereUrano.position.z);
+    uraneCamera.lookAt(sphereUrano.position);
+
+    //Camera Neptuno (configurações)
+    neptuneCamera.position.set(sphereNeptuno.position.x + 3,sphereNeptuno.position.y + 0.5,sphereNeptuno.position.z);
+    neptuneCamera.lookAt(sphereNeptuno.position);
+
+    //Configurações do OVNI
+    OVNI.rotation.y += 0.03;  // Rotação do OVNI
+
+    //fazer as luzes rodarem
+    for (let i = 0; i < OVNI.children.length; i++) {
+        const light = OVNI.children[i];
+        
+        // Verificar se o objeto é uma luz 
+        if (light.geometry.type === 'SphereGeometry' && light.scale.x === 0.01) {
+            const angle = rotationAngle + (i / 8) * Math.PI * 2;  
+            light.position.set(
+                Math.cos(angle) * 1.0 * 0.2,  
+                light.position.y,  
+                Math.sin(angle) * 1.0 * 0.2   
+            );
+        }
+    }
+
+    rotationAngle += 0.08;
+
+
+  
+
+    if (useJupyterCamera) {
+      renderer.render(scene, jupyterCamera);
+    } else if (useEarthCamera) {
+      renderer.render(scene, earthCamera);
+    }else if (useSaturnCamera) {
+      renderer.render(scene, saturnCamera);
+    } else if(useSunCamera) {
+      renderer.render(scene, sunCamera);
+    } else if(useOvniCamera) {
+      renderer.render(scene,ovniCamera);
+    } else if(useCometCamera) {
+      renderer.render(scene,cometCamera);
+    }else if(useMoonCamera) {
+      renderer.render(scene,moonCamera);
+    }else if(useMercuryCamera) {
+      renderer.render(scene,mercuryCamera);
+    }else if(useVenusCamera) {
+      renderer.render(scene,venusCamera);
+    }else if(useMarsCamera) {
+      renderer.render(scene,marsCamera);
+    }else if(useUraneCamera) {
+      renderer.render(scene,uraneCamera);
+    }else if(useNeptuneCamera) {
+      renderer.render(scene,neptuneCamera);
+    }else {
+      renderer.render(scene, camera);
+    }
+  }
+
+  animate();
+</script>
+
+</body>
+</html>
